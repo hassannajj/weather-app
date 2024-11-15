@@ -1,35 +1,58 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from '/vite.svg'
-import './App.css'
+import { useState } from 'react';
+import './App.css';
+import CitySearch from './citySearch';
+import { useEffect } from 'react';
 
 function App() {
-  const [count, setCount] = useState(0)
+  const [count, setCount] = useState(0);
+  const [weatherData, setWeatherData] = useState(null);
+  const [cityData, setCityData] = useState(null);
+
+
+  function fetchWeather(latitude, longitude) {
+    console.log('fetching weather data', latitude, longitude);
+    fetch(`http://localhost:5000/weather?latitude=${latitude}&longitude=${longitude}`)
+      .then((res) => res.json())
+      .then((data) => setWeatherData(data))
+      .catch((error) => console.error('Error fetching data:', error));
+  }
+
+
+  function fetchCity(cityName) {
+    fetch(`http://localhost:5000/city?name=${cityName}`)
+      .then((res) => res.json())
+      .then((data) => {
+        setCityData(data); 
+      })
+      .catch((error) => console.error('Error fetching city data:', error));
+  }
+
+  useEffect(() => {
+    if (cityData && cityData.length > 0) {
+      fetchWeather(cityData[0].latitude, cityData[0].longitude);
+    }
+  }, [cityData]);
 
   return (
-    <>
-      <div>
-        <a href="https://vite.dev" target="_blank">
-          <img src={viteLogo} className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://react.dev" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
-      </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.jsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </>
-  )
+    <div>
+      <h1>Weather Data</h1>
+      <CitySearch 
+        onSearch={fetchCity}
+      />
+      {weatherData && (
+        <div>
+          <h2>Hourly Temperature:</h2>
+          <ul>
+            {weatherData.hourly.time.map((time, index) => (
+              <li key={index}>
+                {new Date(time).toLocaleString()}: {weatherData.hourly.temperature2m[index]}°C
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+    </div>
+  );
 }
 
-export default App
+export default App;
