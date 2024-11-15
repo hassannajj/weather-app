@@ -11,7 +11,11 @@ async function getWeatherData(latitude, longitude) {
   const params = {
     latitude,
     longitude,
-    hourly: 'temperature_2m',
+    hourly: ['temperature_2m',"precipitation_probability"],
+    "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "precipitation_sum"],
+    temperature_unit: "fahrenheit"
+
+
   };
 
   const url = 'https://api.open-meteo.com/v1/forecast';
@@ -20,7 +24,12 @@ async function getWeatherData(latitude, longitude) {
     const responses = await fetchWeatherApi(url, params);
     const response = responses[0];
     const utcOffsetSeconds = response.utcOffsetSeconds();
+
+    const timezone = response.timezone();
+    const timezoneAbbreviation = response.timezoneAbbreviation();
+
     const hourly = response.hourly();
+    const daily = response.daily();
 
     const weatherData = {
       hourly: {
@@ -30,6 +39,17 @@ async function getWeatherData(latitude, longitude) {
           hourly.interval()
         ).map((t) => new Date((t + utcOffsetSeconds) * 1000)),
         temperature2m: hourly.variables(0).valuesArray(),
+        precipitationProbability: hourly.variables(1).valuesArray(),
+
+      },
+      daily: {
+        time: range(Number(daily.time()), Number(daily.timeEnd()), daily.interval()).map(
+          (t) => new Date((t + utcOffsetSeconds) * 1000)
+        ),
+        weatherCode: daily.variables(0).valuesArray(),
+        temperature2mMax: daily.variables(1).valuesArray(),
+        temperature2mMin: daily.variables(2).valuesArray(),
+        precipitationSum: daily.variables(3).valuesArray(),
       },
     };
 

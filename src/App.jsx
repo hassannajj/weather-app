@@ -7,13 +7,14 @@ function App() {
   const [count, setCount] = useState(0);
   const [weatherData, setWeatherData] = useState(null);
   const [cityData, setCityData] = useState(null);
-
+  const [selectedDay, setSelectedDay] = useState(null); // To track which day is selected for the hourly graph
 
   function fetchWeather(latitude, longitude) {
     console.log('fetching weather data', latitude, longitude);
     fetch(`http://localhost:5000/weather?latitude=${latitude}&longitude=${longitude}`)
       .then((res) => res.json())
-      .then((data) => setWeatherData(data))
+      .then((data) => setWeatherData(data)
+      )
       .catch((error) => console.error('Error fetching data:', error));
   }
 
@@ -30,8 +31,11 @@ function App() {
   useEffect(() => {
     if (cityData && cityData.length > 0) {
       fetchWeather(cityData[0].latitude, cityData[0].longitude);
+      console.log('cityData:', cityData); 
+      console.log('weatherData:', weatherData);
     }
   }, [cityData]);
+
 
   return (
     <div>
@@ -45,7 +49,8 @@ function App() {
           <ul>
             {weatherData.hourly.time.map((time, index) => (
               <li key={index}>
-                {new Date(time).toLocaleString()}: {weatherData.hourly.temperature2m[index]}°C
+                {new Date(time).toLocaleString()}: {weatherData.hourly.temperature2m[index]}°F, {weatherData.hourly.precipitationProbability[index]}%
+
               </li>
             ))}
           </ul>
