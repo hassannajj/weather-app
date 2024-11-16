@@ -12,8 +12,9 @@ async function getWeatherData(latitude, longitude) {
     latitude,
     longitude,
     hourly: ['temperature_2m',"precipitation_probability"],
-    "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "precipitation_sum"],
-    temperature_unit: "fahrenheit"
+    "daily": ["weather_code", "temperature_2m_max", "temperature_2m_min", "precipitation_probability_max"],
+    temperature_unit: "fahrenheit",
+    timezone: "America/Los_Angeles", // PST
 
 
   };
@@ -26,6 +27,7 @@ async function getWeatherData(latitude, longitude) {
     const utcOffsetSeconds = response.utcOffsetSeconds();
 
     const timezone = response.timezone();
+    console.log('timezone:', timezone);
     const timezoneAbbreviation = response.timezoneAbbreviation();
 
     const hourly = response.hourly();
@@ -49,7 +51,7 @@ async function getWeatherData(latitude, longitude) {
         weatherCode: daily.variables(0).valuesArray(),
         temperature2mMax: daily.variables(1).valuesArray(),
         temperature2mMin: daily.variables(2).valuesArray(),
-        precipitationSum: daily.variables(3).valuesArray(),
+        precipitationProbabilityMax: daily.variables(3).valuesArray(),
       },
     };
 
