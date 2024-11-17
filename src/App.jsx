@@ -1,7 +1,6 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import './App.css';
 import CitySearch from './citySearch';
-import { useEffect } from 'react';
 import Chart from './Chart';
 
 function App() {
@@ -12,9 +11,6 @@ function App() {
 
   const handleDayClick = (index) => {
     const dateStr = new Date(weatherData.daily.time[index]);
-
-    // 'YYYY-MM-DD' format
-    const formattedDate = dateStr.toISOString().split('T')[0];
     setSelectedDay(index); 
     setIsChartVisible(true);
   };
@@ -23,36 +19,25 @@ function App() {
     setIsChartVisible(false);
   };
 
-
-
   function fetchWeather(latitude, longitude) {
-    console.log('fetching weather data', latitude, longitude);
     fetch(`http://localhost:5000/weather?latitude=${latitude}&longitude=${longitude}`)
       .then((res) => res.json())
-      .then((data) => setWeatherData(data)
-      )
+      .then((data) => setWeatherData(data))
       .catch((error) => console.error('Error fetching data:', error));
   }
-
 
   function fetchCity(cityName) {
     fetch(`http://localhost:5000/city?name=${cityName}`)
       .then((res) => res.json())
-      .then((data) => {
-        setCityData(data); 
-      })
+      .then((data) => setCityData(data))
       .catch((error) => console.error('Error fetching city data:', error));
   }
 
   useEffect(() => {
     if (cityData && cityData.length > 0) {
       fetchWeather(cityData[0].latitude, cityData[0].longitude);
-      console.log('cityData:', cityData); 
-      console.log('weatherData:', weatherData);
     }
   }, [cityData]);
-
-
 
   return (
     <div>
@@ -63,41 +48,30 @@ function App() {
           <CitySearch onSearch={fetchCity} />
           
           {weatherData && (
-            <div>
-              <h2>7 Day Forecast:</h2>
-              <ul>
+            <div className="weather-card">
+              <h2>7 Day Forecast for:</h2>
+              <h2>{cityData[0].name}</h2>
+              <div className="forecast-list">
                 {weatherData.daily.time.map((time, index) => (
                   <div
                     key={index}
                     onClick={() => handleDayClick(index)}
-                    style={{
-                      border: '1px solid #ccc',
-                      padding: '10px',
-                      margin: '10px 0',
-                      cursor: 'pointer',
-                      borderRadius: '5px',
-                      backgroundColor: 'grey',
-                    }}
+                    className="weather-card-item"
                   >
-                    <p>{new Date(time).toDateString()}</p>
-                    <p>
-                      Max Temp: {weatherData.daily.temperature2mMax[index].toPrecision(2)}°F
+                    <p className="weather-date">{new Date(time).toDateString()}</p>
+                    <p className="weather-temp">
+                      Max: {weatherData.daily.temperature2mMax[index].toPrecision(2)}°F
                     </p>
-                    <p>
-                      Min Temp: {weatherData.daily.temperature2mMin[index].toPrecision(2)}°F
+                    <p className="weather-temp">
+                      Min: {weatherData.daily.temperature2mMin[index].toPrecision(2)}°F
                     </p>
-                    <p>Precipitation: {weatherData.daily.precipitationProbabilityMax[index]} %</p>
+                    <p className="weather-precipitation">
+                      Precipitation: {weatherData.daily.precipitationProbabilityMax[index]} %
+                    </p>
                   </div>
                 ))}
-              </ul>
-              <h2>Hourly Temperature:</h2>
-              <ul>
-                {weatherData.hourly.time.map((time, index) => (
-                  <li key={index}>
-                    {new Date(time).toLocaleTimeString()}: {weatherData.hourly.temperature2m[index].toPrecision(2)}°F, {weatherData.hourly.precipitationProbability[index]}%
-                  </li>
-                ))}
-              </ul>
+              </div>
+              
             </div>
           )}
         </div>
@@ -105,13 +79,13 @@ function App() {
   
       {isChartVisible && selectedDay !== null && (
         <div style={{ marginTop: '20px' }}>
-          <button onClick={handleBackClick}>← Back</button> {/* Back button */}
-          {console.log("Selected day index:", weatherData.daily)}
-
-          <h3>Hourly Temperature for {new Date(weatherData.daily.time[selectedDay]).toDateString()}</h3>
+          <button onClick={handleBackClick} className="back-button">← Back</button>
+          <h3>Hourly Temperature for {cityData[0].name}</h3>
+          <h3>{new Date(weatherData.daily.time[selectedDay]).toDateString()}</h3>
           <Chart 
             timestamps={weatherData.hourly.time} 
-            temperatures={weatherData.hourly.temperature2m} 
+            temperatures={weatherData.hourly.temperature2m}
+            rainfall={weatherData.hourly.precipitationProbability} 
             selectedDay={selectedDay} 
           />
         </div>
@@ -119,4 +93,5 @@ function App() {
     </div>
   );
 }
+
 export default App;
