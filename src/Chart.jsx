@@ -77,6 +77,8 @@ const Chart = ({ timestamps, temperatures, rainfall, selectedDay }) => {
         },
       },
       'y-temp': {
+        min: 30,
+        max: 100,
         type: 'linear',
         position: 'left',
         title: {

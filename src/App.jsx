@@ -78,7 +78,7 @@ function App() {
       )}
   
       {isChartVisible && selectedDay !== null && (
-        <div style={{ marginTop: '20px' }}>
+        <div style={{ width: '80%', height: '40%', marginTop: '20px' }}>
           <button onClick={handleBackClick} className="back-button">← Back</button>
           <h3>Hourly Temperature for {cityData[0].name}</h3>
           <h3>{new Date(weatherData.daily.time[selectedDay]).toDateString()}</h3>
