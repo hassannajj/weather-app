@@ -36,6 +36,10 @@
   }
 }
 
+.pm-desc {
+  font-size: 0.5em;
+}
+
 .card {
   padding: 2em;
 }

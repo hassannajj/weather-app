@@ -1,8 +1,19 @@
-# React + Vite
+This is a weather app created using React
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+This was made using two API's
 
-Currently, two official plugins are available:
+The first API (https://api-ninjas.com/api/city)
+takes a city name and returns the latitude and longitutde
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react/README.md) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Ex:  "San Francisco" -> 
+        {"latitude": 37.7562,
+        "longitude": -122.443}
+
+Then I took the latitude and longitude and put it into 
+a weather API (https://open-meteo.com) which returned 
+a list of temperatures and rain probabilities for 
+the next 7 days.
+
+I then took this data and displayed the 7 days and when you
+click on a specific day, it shows you a chart (chartJS) of the 
+temperature and chance of rain throughout the day
